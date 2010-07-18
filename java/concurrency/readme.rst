@@ -37,7 +37,7 @@ Example: Synchronized::
 ----
 
 
-This analysis is going to focus on three areas:
+I'll break this down into three different areas:
 
 #. Language Definition : What does the langugage spec say? See [JLS3]_, [JPL4]_.
 #. Emitted ByteCode : What does an examination of the byte code show? See [PJVM]_.
@@ -45,19 +45,18 @@ This analysis is going to focus on three areas:
 
 By the way, if you haven't yet, check out [JAMEX]_. Neil Coffey's site is a great resource.
 
-Some key concepts that will covered shortly:
-
-* Java Memory Model
-* Happens-Before Relationships
-* Threads and Locks
-* Actions
 
 Byte Code
 ===================
 
+If you're like me, then you like looking 'under the hood' to see what's going on. I'm reading Joshua Engel's book, *Programming for the Java Virtual Machine* [PJVM]_, and I really like the ability to analyze class files at a higher abstraction than the raw bytes. For this, Engel presents Oolong, a language uses "words and numbers in place of binary values". This means that we can convert java class files into a human readable format...but they are still class files, not java code. In this section, we're going incrementally build a java class and examine the Oolong output. This way, we can more easily understand the impact, at the byte code level, of marking a field as volatile, or a method or code block as synchronized. 
+
+Note: Sources are available at [TODDG]_.
+
 Class Byte Code
 ---------------
-Before we dive into the language, let's look at some code samples. Sources are available at [TODDG]_.
+
+Let's start with the most basic class file possible:
 
 Example: Class1.java ::
 
@@ -65,6 +64,13 @@ Example: Class1.java ::
     }
 
 If we compile Class1.java to Class1.class, and then decompile using Gnoloo, then we wind up with the following Oolong code. Oolong is simply a human readable version of the class file, and is fully described here [PJVM]_.
+
+Here's how I compiled and decompiled the classes::
+
+    javac [class].java -d build.out/
+    java -cp $PATH Gnoloo build.out/[class].class >  build.out/[class].j
+
+This assumes that you've unziped the lib/0201309726_CD.zip and placed the contents in your PATH. 
 
 Example: Class1.j  (Note the suffix 'j' for Oolong files)::
 
@@ -83,12 +89,39 @@ Example: Class1.j  (Note the suffix 'j' for Oolong files)::
 
     .end method
 
-The Oolong code shows that we are loading the 'this' variable at l0: **"l0:    aload_0"**. Subsequently, we are invoking the super class's init() method, and returning the top of the stack. TODO: verify what is being returned at the top of the stack.
-    
+
+See [PVJM]_ for full details on the Oolong language. The part that I want to highlight is the following...
+
+The .var statement is literally stating that variable 0 is the *this* class, Class1::
+
+     .var 0 is this LClass1; from l0 to l5
+
+A .line statement is added to assist a debugger, should one be attached. (That's also what the .source line above was for, too::
+
+    .line 1
+
+Push the reference to *this* stored in varible 0 onto the stack::
+
+    l0:    aload_0
+
+Invoke the super class init method::
+
+    l1:    invokespecial java/lang/Object/<init> ()V
+
+Return::
+
+    l4:    return
+
+
+TODO: verify what is being returned at the top of the stack.
+
+This is so cool. If you don't have it, get a copy of Engel's book. 
 
 
 Field Byte Code
 ---------------------
+
+Ok, to continue, let's see what happens when we add a field to the class.
 
 Example: Class2.java ::
 
@@ -115,11 +148,17 @@ Example: Class2.j ::
 
     .end method
 
-Oolong shows that we added a new private field in this line: **".field private i I"**. Note that 'I' means int. If it had been an Integer, then this line would have been ".field private i Ljava.lang.Integer;"
+Oolong shows that we added a new private field::
+
+    .field private i I
+    
+Note that 'I' means int. If it had been an Integer, then this line would have been ".field private i Ljava.lang.Integer;" So that was not terribly exciting. We add a field, and we can see it in Oolong. No big deal.
 
 
 Accessor Byte Code
 ------------------
+
+Now let's add the getters and setters for our private variable.
 
 Example: Class3.java ::
 
@@ -135,6 +174,7 @@ Example: Class3.java ::
         }
     }
 
+Adding these two methods produces considerably more Oolong code. I've broken the returned class into several parts below.
 
 Example: Class3.j : The class is the same::
 
@@ -155,7 +195,9 @@ Example: Class3.j : The class is the same::
 
     .end method
 
-Example: Class3.j : But we've added a getter::
+The basic class is the same, including the class header, the field, and the constructor.
+
+Example: Class3.j : Getter byte code::
 
     .method public getI ()I
     .limit stack 1
@@ -167,6 +209,30 @@ Example: Class3.j : But we've added a getter::
     l4:    ireturn
 
     .end method
+
+I'll explain the getter in detail. First, we define the method::
+
+    .method public getI ()I
+
+This is a public method that returns an int (remember, 'I' means 'int', not Integer).
+
+Here we're again storing *this* in variable 0::
+
+    .var 0 is this LClass3; from l0 to l5
+
+And again, we're pushing the reference in variable 0 (*this*) onto the stack::
+
+    l0:    aload_0
+
+At this point, we're invoking the getfield on the class. Notice how the field is qualified by [classname]/[fieldname]. The type is declared as in int.
+
+    l1:    getfield Class3/i I
+
+
+The last operation in the method is to return an int::
+
+    l4:    ireturn
+
 
 Example: Class3.j : And we've added a setter::
 
@@ -184,7 +250,31 @@ Example: Class3.j : And we've added a setter::
 
     .end method
 
+Let's take the setter apart. The method definition states that it has one int parameter, *I*, and it returns void, *V*::
 
+    .method public setI (I)V
+
+Again we declare variable 0 is a reference to *this*::
+
+    .var 0 is this LClass3; from l0 to l6
+
+Next we declare variable 1 is in integer. Basically, for a class instance, variable 0 is the class, and subsequent variables are the parameters passed to the method::
+
+    .var 1 is i I from l0 to l6
+
+Push the variables onto the stack so that they can be consumed by the putfield operaiton::
+
+    l0:    aload_0
+    l1:    iload_1
+
+The putfield operation pops the parameter and class instance reference off the stack and sets the value of the instance field::
+
+    l2:    putfield Class3/i I
+
+Nothing to return, so we just return::
+
+    l5:    return
+ 
 Voltile Field Byte Code
 -----------------------
 
@@ -386,6 +476,12 @@ This is interesting because it shows the explicit acquire and release of the mon
 
 Language Definition
 ===================
+
+* Java Memory Model
+* Happens-Before Relationships
+* Threads and Locks
+* Actions
+
 
 
 
