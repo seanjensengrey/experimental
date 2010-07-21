@@ -5,8 +5,8 @@ Java Concurrency
 .. footer:: Copyright (c) 2010 Todd D. Greenwood-Geer 
 
 :Author: Todd D. Greenwood-Geer
-:Date: Mon Jul 19  2010
-:Version: 0.1
+:Date: Tue Jul 20  2010
+:Version: 0.2
 
 ---------------------------------------------------------
 What's the difference between volatile and synchronized?
