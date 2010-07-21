@@ -1,11 +1,11 @@
 public class Class3 {
-    private int i;
+    private int myInt;
 
-    public int getI() {
-        return i;
+    public int getMyInt() {
+        return myInt;
     }
 
-    public void setI(int i) {
-        this.i = i;
+    public void setMyInt(int i) {
+        this.myInt = i;
     }
 }

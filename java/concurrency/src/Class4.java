@@ -1,11 +1,11 @@
 public class Class4 {
-    private volatile int i;
+    private volatile int myVolatileInt;
 
-    public int getI() {
-        return i;
+    public int getMyVolatileInt() {
+        return myVolatileInt;
     }
 
-    public void setI(int i) {
-        this.i = i;
+    public void setMyVolatileInt(int i) {
+        this.myVolatileInt = i;
     }
 }

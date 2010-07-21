@@ -1,11 +1,11 @@
 public class Class5 {
-    private int i;
+    private int myInt;
 
-    public synchronized int getI() {
-        return i;
+    public synchronized int getMyInt() {
+        return myInt;
     }
 
-    public synchronized void setI(int i) {
-        this.i = i;
+    public synchronized void setMyInt(int i) {
+        this.myInt = i;
     }
 }
