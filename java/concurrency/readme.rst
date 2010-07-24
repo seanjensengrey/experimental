@@ -763,4 +763,10 @@ References
     http://www.javamex.com/tutorials/synchronization_piggyback.shtml
 
 .. [GREENWOOD] http://github.com/ToddG/experimental/java/concurrency
-concurrency
+
+Random Links
+============
+
+    http://en.wikipedia.org/wiki/Double-checked_locking
+    http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
+    http://www.javaworld.com/jw-02-2001/jw-0209-double.html
