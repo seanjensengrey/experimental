@@ -49,7 +49,7 @@ Examining the emitted byte code did not yield conclusive evidence. Volatile vari
 
 So, for a brief moment, I thought I had this figured out. It seemed that synchronized methods were more coarse grained, and would cause flushing of all the variables from a threads working memory. Taking a lock via monitorenter would cause the thread lose it's state and load the variables from main memory. Likewise, releasing the lock via monitorexit would write it's state to main memory. In sharp contrast, it seemed that volatile variables would *not* take a lock, and could be thought of as fine grained actions that cause a thread to read and write a single variable directly to and from main memory...without incurring the overhead of flushing all thread level variables. **This does not seem to be true, and is directly contradicted by the following**:
 
-[Pugh]_"Under the new memory model, it is still true that volatile variables cannot be reordered with each other. The difference is that it is now no longer so easy to reorder normal field accesses around them. Writing to a volatile field has the same memory effect as a monitor release, and reading from a volatile field has the same memory effect as a monitor acquire. In effect, because the new memory model places stricter constraints on reordering of volatile field accesses with other field accesses, volatile or not, anything that was visible to thread A when it writes to volatile field f becomes visible to thread B when it reads f."
+[PUGH]_"Under the new memory model, it is still true that volatile variables cannot be reordered with each other. The difference is that it is now no longer so easy to reorder normal field accesses around them. Writing to a volatile field has the same memory effect as a monitor release, and reading from a volatile field has the same memory effect as a monitor acquire. In effect, because the new memory model places stricter constraints on reordering of volatile field accesses with other field accesses, volatile or not, anything that was visible to thread A when it writes to volatile field f becomes visible to thread B when it reads f."
 
 Pugh continues with, 
 
@@ -770,7 +770,7 @@ References
     http://www.javamex.com/tutorials/double_checked_locking_fixing.shtml
     http://www.javamex.com/tutorials/synchronization_piggyback.shtml
 
-.. [PUGH]_ http://www.cs.umd.edu/~pugh/java/memoryModel/jsr-133-faq.html
+.. [PUGH] http://www.cs.umd.edu/~pugh/java/memoryModel/jsr-133-faq.html
 
 .. [GREENWOOD] http://github.com/ToddG/experimental/java/concurrency
 
