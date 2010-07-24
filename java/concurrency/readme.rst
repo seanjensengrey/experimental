@@ -5,8 +5,8 @@ Java Concurrency
 .. footer:: Copyright (c) 2010 Todd D. Greenwood-Geer 
 
 :Author: Todd D. Greenwood-Geer
-:Date: Tue Jul 20  2010
-:Version: 0.2
+:Date: Tue Jul 23  2010
+:Version: 0.3
 
 ---------------------------------------------------------
 What's the difference between volatile and synchronized?
@@ -32,7 +32,7 @@ Example: Synchronized::
         }
     }
 
-**This article addresses the question: what is the difference, if any, between these two code fragments?**
+**What is the difference, if any, between these two code fragments?**
 
 ----
 
@@ -45,17 +45,16 @@ Executive Summary
 
 Examining the emitted byte code did not yield conclusive evidence. Volatile variables are marked in the byte code as such. Similarily, synchronized methods are also marked. Synchronized code blocks produce altogether more byte code, and includes byte code for incrementing and decrementing the lock via 'monitorenter' and 'monitorexit'. Synchronized code blocks also produce exception handler code to decrement or release the lock should an exception be thrown. But none of this proves a difference between 'volatile' and 'synchronized'... for this, I had to examine the JVM Spec [LINDHOLM]_ and the Java Language Spec [GOSLING]_. 
 
-[LINDHOLM]_ (page 403-404) Section 8.6 addresses "Rules About the Interaction of Locks and Variables", and section 8.7 addresses "Rules for volatile Variables". This section is the key, and the basic difference is that thread access of volatile variables defers directly to the JVM's main memory. No re-ordering of reads and writes is permitted (or possible). Synchronized methods (and code blocks) on the other hand, allow *store* operations to occur before *assign* operations. This is discussed in [LINDHOLM]_ Section 8.8. Moreover, Section 8.9 states that, "Any association between locks and variables is purely conventional. Locking any lock conceptually flushes all variables from a thread's working memory, and unlocking any lock forces the writing out to main memory of *all* variabels that the thread has assigned." 
+[LINDHOLM]_ (page 403-404) Section 8.6 addresses *"Rules About the Interaction of Locks and Variables",* and section 8.7 addresses *"Rules for volatile Variables".* This section is the key, and the basic difference is that thread access of volatile variables defers directly to the JVM's main memory. No re-ordering of reads and writes is permitted (or possible). Synchronized methods (and code blocks) on the other hand, allow *store* operations to occur before *assign* operations. This is discussed in [LINDHOLM]_ Section 8.8. Moreover, Section 8.9 states that, *"Any association between locks and variables is purely conventional. Locking any lock conceptually flushes all variables from a thread's working memory, and unlocking any lock forces the writing out to main memory of all variables that the thread has assigned."*
 
-So, for a brief moment, I thought I had this figured out. It seemed that synchronized methods were more coarse grained, and would cause flushing of all the variables from a threads working memory. Taking a lock via monitorenter would cause the thread lose it's state and load the variables from main memory. Likewise, releasing the lock via monitorexit would write it's state to main memory. In sharp contrast, it seemed that volatile variables would *not* take a lock, and could be thought of as fine grained actions that cause a thread to read and write a single variable directly to and from main memory...without incurring the overhead of flushing all thread level variables. **This does not seem to be true, and is directly contradicted by the following**:
+So, for a brief moment, I thought I had this figured out. It seemed that synchronized methods were more coarse grained, and would cause flushing of all the variables from a threads working memory. Taking a lock via monitorenter would cause the thread lose it's state and load the variables from main memory. Likewise, releasing the lock via monitorexit would write it's state to main memory. In sharp contrast, it seemed that volatile variables would *not* take a lock, and could be thought of as fine grained actions that cause a thread to read and write a single variable directly to and from main memory...without incurring the overhead of flushing all thread level variables. **This does not seem to be true, and is directly contradicted by Jeremey Manson and Brian Goetz in the 'JSR 133 (Java Memory Model) FAQ':**:
 
-[PUGH]_"Under the new memory model, it is still true that volatile variables cannot be reordered with each other. The difference is that it is now no longer so easy to reorder normal field accesses around them. Writing to a volatile field has the same memory effect as a monitor release, and reading from a volatile field has the same memory effect as a monitor acquire. In effect, because the new memory model places stricter constraints on reordering of volatile field accesses with other field accesses, volatile or not, anything that was visible to thread A when it writes to volatile field f becomes visible to thread B when it reads f."
+[MANSON]_ *"Under the new memory model, it is still true that volatile variables cannot be reordered with each other. The difference is that it is now no longer so easy to reorder normal field accesses around them. Writing to a volatile field has the same memory effect as a monitor release, and reading from a volatile field has the same memory effect as a monitor acquire. In effect, because the new memory model places stricter constraints on reordering of volatile field accesses with other field accesses, volatile or not, anything that was visible to thread A when it writes to volatile field f becomes visible to thread B when it reads f."*
 
-Pugh continues with, 
+Manson and Goetz continue with, 
 
-"Effectively, the semantics of volatile have been strengthened substantially, almost to the level of synchronization. Each read or write of a volatile field acts like "half" a synchronization, for purposes of visibility.
-
-Important Note: Note that it is important for both threads to access the same volatile variable in order to properly set up the happens-before relationship. It is not the case that everything visible to thread A when it writes volatile field f becomes visible to thread B after it reads volatile field g. The release and acquire have to "match" (i.e., be performed on the same volatile field) to have the right semantics."
+*"Effectively, the semantics of volatile have been strengthened substantially, almost to the level of synchronization. Each read or write of a volatile field acts like "half" a synchronization, for purposes of visibility. 
+Important Note: Note that it is important for both threads to access the same volatile variable in order to properly set up the happens-before relationship. It is not the case that everything visible to thread A when it writes volatile field f becomes visible to thread B after it reads volatile field g. The release and acquire have to "match" (i.e., be performed on the same volatile field) to have the right semantics."*
 
 
 RoadMap
@@ -190,7 +189,7 @@ Example: Class3.java ::
         }
     }
 
-Adding these two methods produces considerably more byte code::
+Adding these two methods produces considerably more byte code...
 
 Example: Class3.j ::
 
@@ -732,11 +731,6 @@ JVM Definition
 ===================
 TODO: Flesh out this material from the summary...
 
-[LINDHOLM]_ (page 403-404) Section 8.6 addresses "Rules About the Interaction of Locks and Variables", and section 8.7 addresses "Rules for volatile Variables". This section is the key, and the basic difference is that thread access of volatile variables defers directly to the JVM's main memory. No re-ordering of reads and writes is permitted (or possible). Synchronized methods (and code blocks) on the other hand, allow *store* operations to occur before *assign* operations. This is discussed in [LINDHOLM]_ Section 8.8. Moreover, Section 8.9 states that, "Any association between locks and variables is purely conventional. Locking any lock conceptually flushes all variables from a thread's working memory, and unlocking any lock forces the writing out to main memory of *all* variabels that the thread has assigned." 
-
-So, in a nutshell, synchronized methods are more coarse grained, and cause flushing of all the variables from a threads working memory, and the subsequent re-loading of those variables from main memory. In sharp contrast, volatile variables do *not* take a lock, and are a more fine grained action that causes a thread to read and write a single variable directly to and from main memory...without incurring the overhead of flushing all thread level variables.
-
-
 References
 ==========
 
@@ -770,7 +764,7 @@ References
     http://www.javamex.com/tutorials/double_checked_locking_fixing.shtml
     http://www.javamex.com/tutorials/synchronization_piggyback.shtml
 
-.. [PUGH] http://www.cs.umd.edu/~pugh/java/memoryModel/jsr-133-faq.html
+.. [MANSON] http://www.cs.umd.edu/~pugh/java/memoryModel/jsr-133-faq.html
 
 .. [GREENWOOD] http://github.com/ToddG/experimental/java/concurrency
 
@@ -778,5 +772,6 @@ Random Links
 ============
 
     http://en.wikipedia.org/wiki/Double-checked_locking
+    http://www.cs.umd.edu/~pugh/java/memoryModel/
     http://www.cs.umd.edu/~pugh/java/memoryModel/DoubleCheckedLocking.html
     http://www.javaworld.com/jw-02-2001/jw-0209-double.html
