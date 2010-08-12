@@ -40,4 +40,3 @@
 (defn get-entries [dir]
   (map #(create-gutenberg-entry %) (fh/get-handled-files dir)))
 
-

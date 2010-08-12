@@ -71,13 +71,15 @@
   (let [buf (make-array (. Byte TYPE) BUFFER)
         output-file (File/createTempFile "zip_" (encode-file-name zipfile current-entry))]
     (with-open [#^BufferedOutputStream bos (BufferedOutputStream. (FileOutputStream. output-file) BUFFER)]
-      (loop [bytes-read (.read zis buf 0 BUFFER)]
-        (if (= bytes-read -1)
-          output-file
-          (recur
-            (do
-              (.write bos buf 0 bytes-read)
-              (.read zis buf 0 BUFFER))))))))
+      (do
+        (println "processing zipfile: " zipfile ", entry: " current-entry ", tempfile: " (.getName output-file))
+        (loop [bytes-read (.read zis buf 0 BUFFER)]
+          (if (= bytes-read -1)
+            output-file
+            (recur
+              (do
+                (.write bos buf 0 bytes-read)
+                (.read zis buf 0 BUFFER)))))))))
 
 (defn extract-file-from-zipfile [#^String entry-name #^File zipfile]
   "

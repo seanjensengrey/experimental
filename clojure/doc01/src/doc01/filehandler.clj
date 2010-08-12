@@ -11,16 +11,12 @@
   (let [fname (.toLowerCase file-name)
         lindex (.lastIndexOf fname ".")
         ending (.substring fname lindex)]
-    (do
-      (if (.equals ending ".zip")
-        ::ZIP
-        (if (.equals ending ".jar")
-          ::ZIP
-          (if (.equals ending ".txt")
-            ::TEXT
-            (if (.equals ending ".text")
-              ::TEXT
-              ::UNKNOWN)))))))
+    (cond
+      (.equals ending ".zip") ::ZIP
+      (.equals ending ".jar") ::ZIP
+      (.equals ending ".txt") ::TEXT
+      (.equals ending ".text") ::TEXT
+      :default ::UNKNOWN)))
 (defmethod get-file-type File [file]
   (get-file-type (.getName file)))
 
