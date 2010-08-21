@@ -19,6 +19,10 @@ Example::
 
 You should now have a tmux (like screen) session, divided into two panes, with a vim editor on the left and a clojure repl on the right.
 
+<img src="http://github.com/ToddG/experimental/blob/master/clojure/tmux/tmux-screenshot01.png"/>
+<img src="./tmux-screenshot01.png"/>
+<img src="tmux-screenshot01.png"/>
+
 .. image:: ./tmux-screenshot01.png
    :height: 100
    :width: 200
