@@ -1,7 +1,20 @@
 #!/bin/sh
+
+usage="$0 [file] [workspace]"
+
+# check inputs
+if [ -z "$1" ]; then
+    echo $usage
+    exit
+fi
+
+if [ -z "$2" ]; then
+    echo $usage
+    exit
+fi
+
 target=$1
 workspace=$2
-cmd="call Tmux_Init('$workspace',0,0)"
 
 #kill and create this session
 tmux kill-session -t $workspace
