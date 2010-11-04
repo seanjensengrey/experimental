@@ -26,7 +26,7 @@ Example: Volatile::
 Example: Synchronized::
 
     public class FooSynchronized(){
-        private volatile int i;
+        private int i;
         public synchronized int getI(){
             return i;
         }
