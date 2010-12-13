@@ -30,7 +30,7 @@ tmux split-window -t $workspace:0 -h
 tmux select-pane -t $workspace:0.0
 
 #launch clojure (remember the ^M is actually C-v RETURN) on the right hand pane
-tmux send-keys -t $workspace:0.right 'clj.sh'
+tmux send-keys -t $workspace:0.right 'lein repl'
 
 #configure the tmux vim plugin to use this session/window/pane combination (right hand pane is pane #1)
 tmux send-keys -t $workspace:0.0 ":call Tmux_Init('$workspace',0,1)"

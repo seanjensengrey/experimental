@@ -34,9 +34,10 @@
 #
 
 JAVA=java
-JLINE_JAR=/Users/todd/bin/jline/jline-0_9_5.jar
-CLOJURE_JAR=/Users/todd/bin/clojure/clojure.jar
-CLOJURE_CONTRIB_JAR=/Users/todd/bin/clojure/clojure-contrib.jar
+#defined in my ~/.bash_exports
+    #JLINE_JAR=/Users/todd/bin/jline/jline-0_9_5.jar
+    #CLOJURE_JAR=/Users/todd/bin/clojure/clojure.jar
+    #CLOJURE_CONTRIB_JAR=/Users/todd/bin/clojure/clojure-contrib.jar
 CP=$JLINE_JAR:$CLOJURE_JAR:$CLOJURE_CONTRIB_JAR
 
 # Add extra jars as specified by `.clojure` file

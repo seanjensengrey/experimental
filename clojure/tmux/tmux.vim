@@ -1,11 +1,15 @@
-
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" tmux.vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 function! Send_to_Tmux(text)
   if !exists("g:tmux_session") || !exists("g:tmux_window") || !exists("g:tmux_pane")
     call Tmux_Vars()
   end
-  echo system("tmux send-keys -t " . g:tmux_session . ":" . g:tmux_window . "." . g:tmux_pane . " '" . a:text . "'")
+  "echo 'sending... ' . a:text
+  let target = g:tmux_session . ":" . g:tmux_window . "." . g:tmux_pane
+  call system("tmux set-buffer -t " . g:tmux_session . " '" . substitute(a:text, "'", "'\\\\''", 'g') . "'" )
+  call system("tmux paste-buffer -t " . target)
 endfunction
 
 function! Tmux_Sessions()
@@ -33,8 +37,13 @@ endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
+" copy and send a block of text
 vmap <C-c><C-c> "ry :call Send_to_Tmux(@r)<CR>
 nmap <C-c><C-c> vip<C-c><C-c>
 
-nmap <C-c>v :call Tmux_Vars()<CR>
+" copy and send entire doc
+"vmap <C-c><C-a> "by :call Send_to_Tmux(@b)<CR>
+"nmap <C-c><C-a> govG<end><C-c><C-a>
+nmap <C-c><C-a> govG<end><C-c><C-c>
 
+"nmap <C-c>v :call Tmux_Vars()<CR>

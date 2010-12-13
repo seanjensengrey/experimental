@@ -1,7 +1,9 @@
 ============================
 Vim+Clojure+Tmux
 ============================
-Based on http://technotales.wordpress.com/2008/10/17/screencast-like-slime-for-vim/
+Based on:
+    http://technotales.wordpress.com/2008/10/17/screencast-like-slime-for-vim/
+    http://github.com/kikijump/tslime.vim/blob/master/tslime.vim
 
 Installation
 ------------
@@ -17,28 +19,11 @@ Example::
 
      ./start-vim-clojure-session.sh foo.clj ws01
 
-You should now have a tmux (like screen) session, divided into two panes, with a vim editor on the left and a clojure repl on the right.
+1. You should now have a tmux (like screen) session, divided into two panes, with a vim editor on the left and a clojure repl on the right.
 
-.. image:: tmux-screenshot01.png
-   :height: 100
-   :width: 200
-   :scale: 50
-   :alt: tmux-screenshot01
+2. In vim, place your cursor on any block of text that you want to send to the repl, and type C-c C-c (control-c control-c, in quick succession). This should send your text to the repl, and execute it there.
 
-.. image:: ./tmux-screenshot01.png
-   :height: 100
-   :width: 200
-   :scale: 50
-   :alt: tmux-screenshot01
-
-
-In vim, place your cursor on any block of text that you want to send to the repl, and type C-c C-c (control-c control-c, in quick succession). This should send your text to the repl, and execute it there.
-
-.. image:: ./tmux-screenshot02.png
-   :height: 100
-   :width: 200
-   :scale: 50
-   :alt: tmux-screenshot02
+3. To send the entire file to the repl, type C-c C-a.
 
 Have fun.
 -Todd
