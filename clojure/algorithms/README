@@ -1,17 +1,13 @@
 # algorithms
 
-FIXME: write description
+Primitive implementations of basic algorithms for the purpose of learning Clojure.
 
 ## Usage
 
-FIXME: write
-
-## Installation
-
-FIXME: write
+Don't use.
 
 ## License
 
-Copyright (C) 2010 FIXME
+Copyright (C) 2010 Todd Greenwood-Geer
 
 Distributed under the Eclipse Public License, the same as Clojure.
