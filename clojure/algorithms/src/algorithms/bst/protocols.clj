@@ -1,0 +1,72 @@
+(ns algorithms.bst.protocols)
+
+;; -----------------------------------------------------------------------------
+;; A simple BST implemented in Clojure using both defrecord and defprotocol.
+;; Note the use of the unwind function to update the graph after each insertion.
+;;
+;; References:
+;;
+;; BST/Clojure
+;; http://nflath.com/2009/07/avl-tree-implementation-in-clojure/
+;; https://secure.wikimedia.org/wikipedia/en/wiki/Binary_search_tree
+;;
+;; Recommends against using clojure to write a bst, use sorted-map or sorted-set instead
+;; http://stackoverflow.com/questions/1611157/how-do-you-make-a-binary-search-tree-in-clojure
+;;
+;; Processing large binary files in clojure:
+;; http://efreedom.com/Question/1-3538834/Process-Large-Binary-Data-Clojure
+;;
+;; Clojure Protocols:
+;; http://freegeek.in/blog/2010/05/clojure-protocols-datatypes-a-sneak-peek/
+;;
+;; Lisp Binary Search Tree
+;; http://digital.cs.usu.edu/~vkulyukin/vkweb/software/bst/bst.html
+;; http://www.comanswer.com/question/help-with-lisp-code-for-a-binary-tree
+;; http://www.cs.sfu.ca/CC/310/pwfong/Lisp/3/tutorial3.html
+;;
+;; Clojure.zip
+;; http://clojure.org/other_libraries
+;; http://www.exampler.com/blog/2010/09/01/editing-trees-in-clojure-with-clojurezip/
+;;
+;; Clojure 'cond'
+;; http://code-redefined.blogspot.com/2010/02/else-clause-in-clojure-cond.html
+;; http://clojuredocs.org/clojure_core/clojure.core/cond
+;;
+;; Cloure defrecord default contstructor arguments
+;; http://www.mail-archive.com/clojure@googlegroups.com/msg33291.html
+;; http://clojuredocs.org/clojure_core/clojure.core/defrecord
+;; http://cemerick.com/2010/08/02/defrecord-slot-defaults/
+;;
+;; Clojure hash-map vs. sorted-map key behavior
+;; https://groups.google.com/group/clojure/browse_thread/thread/ce3e58879e4724a3
+;; http://download.oracle.com/javase/1.4.2/docs/api/java/util/TreeMap.html
+;;
+;; Clojure defrecord / map
+;; http://stackoverflow.com/questions/3744349/how-do-i-get-core-clojure-functions-to-work-with-my-defrecords
+;;
+;; Protocols video by Stuart Halloway
+;; http://vimeo.com/11236603
+;;
+;; Debugging macros
+;; http://stackoverflow.com/questions/2352020/debugging-in-clojure
+;; -----------------------------------------------------------------------------
+
+;;debugging parts of expressions
+(defmacro dbg[x] `(let [x# ~x] (println "dbg:" '~x "=" x#) x#))
+
+;; ----------------------------------------------
+;; Protocols
+;; ----------------------------------------------
+(defprotocol BINARYTREE
+  (root [this])
+  (insert [this node])
+  (delete [this node])
+  (search [this key])
+  (minimum [this])
+  (maximum [this]))
+
+(defprotocol TRAVERSAL
+  (inorder [this tree visitor])
+  (preorder [this tree visitor])
+  (postorder [this tree visitor]))
+
