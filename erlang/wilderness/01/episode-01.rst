@@ -1,6 +1,6 @@
-==============================================
+=================================================
 Hacking Through The Erlang Wilderness : Episode 1
-==============================================
+=================================================
 
 .. footer:: Copyright (c) 2011 Todd D. Greenwood-Geer 
 
@@ -12,17 +12,17 @@ Hacking Through The Erlang Wilderness : Episode 1
 Installation
 -----------------------
 
-In this demo, I'll walk you through installing erlang and some associated tools. The next demo will walk you through creating your first application using those tools. Be sure to check out this tutorial as well, [FAXIEN_SINAN_DEMO]_, and the rebar demo from the Basho blog, [BASHO]_. 
+In this demo, I'll walk you through installing erlang and some associated tools. The next demo will walk you through creating your first application using those tools.
 
-1. Get your os in order
+1. Get your os in order::
 
-I am running these demos on an ubuntu 10.04 guest os in VMWare::
-
+    // I am running these demos on an ubuntu 10.04 guest os in VMWare
+    //
     todd@ubuntu:~/temp/app01$ uname -a
     Linux ubuntu 2.6.32-24-generic #43-Ubuntu SMP Thu Sep 16 14:17:33 UTC 2010 i686 GNU/Linux
-
-My host is a Macbook::
-
+    //
+    //My host is a Macbook
+    //
     Model Name:   MacBook
     Model Identifier: MacBook4,1
     Processor Name:   Intel Core 2 Duo
@@ -31,6 +31,8 @@ My host is a Macbook::
     Total Number Of Cores:    2
     L2 Cache: 3 MB
     Memory:   4 GB
+
+Note: I tried running everything on my macbook first. However, I ran into issues and didn't want to bother with sorting them out. So far, running on an Ubuntu VM has been pretty painless.
 
 2. Install erlang and goodies via the package manager::
 
@@ -90,11 +92,11 @@ My host is a Macbook::
     erlang-webtool - Erlang/OTP helper for web-based tools
     erlang-x11 - Erlang/OTP applications that require X Window System
 
-Install erlang::
+3. Install erlang::
 
     $ apt-get install erlang
 
-I have other stuff installed, too::
+4. Incidentally, I have other erlang stuff installed, too, probably from the erlang package::
 
     todd@ubuntu:~$ dpkg -l | grep erlang
     ii  erlang-base                      1:13.b.3-dfsg-2ubuntu2.1                 Erlang/OTP virtual machine and base applications
@@ -108,14 +110,14 @@ I have other stuff installed, too::
     ii  erlang-snmp                      1:13.b.3-dfsg-2ubuntu2.1                 Erlang/OTP SNMP applications
     ii  erlang-syntax-tools              1:13.b.3-dfsg-2ubuntu2.1                 Erlang/OTP modules for handling abstract Erlang synta
 
-3. Install sinan, faxien, and rebar. By the way, there are great resources showing you how to install these things...
+5. Install sinan, faxien, and rebar. By the way, there are great resources showing you how to install these things...
 
  * Sinan_Faxien_Demo_ : A tutorial that uses sinan and faxien.
  * Erlware_ : Installation instructions that are a bit hard to follow, check out the video above.
  * Basho_Rebar_Demo_ : The basho rebar demo presentation.
- * Basho_ : Great wiki documentation on rebar. 
+ * Rebar_ : Great wiki documentation on rebar. 
 
-4. TODO: flesh out this demo by installing these tools on a fresh vm instance? I'm not sure if that would be useful as the Sinan_Faxien_Demo_ is pretty good.
+6. TODO: flesh out this demo by installing these tools on a fresh vm instance.
 
 
 References
@@ -131,13 +133,10 @@ References
     Erlang Programming
     O'Reily, 2009. ISBN 978-0-596-51818-9
 
- .. [LOGAN]
+.. [LOGAN]
     Logan, Martin, Merritt, Eric, Carlsson, Richard.
     Erlang and OTP in Action
     Manning, 2011. ISBN 9781933988788
-
-Links
-=====
 
 .. _Sinan_Faxien_Demo: http://www.youtube.com/watch?v=XI7S2NwFPOE
 
