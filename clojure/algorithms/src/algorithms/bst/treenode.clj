@@ -13,9 +13,9 @@
 
 
 (defrecord TreeNode
-  ;  "Tree implementation of a BST. Each node has a pointer to a left and right child. Note that there
-  ;  is no parent pointer. This is b/c that would force the entire tree to be re-built for each node
-  ;  addition and deletion. In this impl, only the path from the node back up to the root mist be re-built."
+    "Tree implementation of a BST. Each node has a pointer to a left and right child. Note that there
+    is no parent pointer. This is b/c that would force the entire tree to be re-built for each node
+    addition and deletion. In this impl, only the path from the node back up to the root mist be re-built."
   [left right key]
 
   BINARYTREE
@@ -65,6 +65,7 @@
 
 (defn create-TreeNode [left right key] (TreeNode. left right key))
 
+(sorted-map)
 
 
 ;; ----------------------------------------------
