@@ -2,6 +2,7 @@
   (:use [algorithms.bst.hashtree] :reload)
   (:use [algorithms.bst.treenode] :reload)
   (:use [algorithms.bst.testhelper] )
+  (:use [algorithms.bst.protocols] )
   (:use [clojure.test]))
 
 ;; create test data
@@ -24,18 +25,19 @@
 ;;; ----------------------------------------------
 ;;; Helper
 ;;; ----------------------------------------------
-;(defn visual-tree-test [t s]
-;  (do
-;    (message (str "Testing " s))
-;    (println "tree: " t)
-;    (println "tree (toString): " (str t))
-;    (println (str "minimum: " (minimum t)))
-;    (println (str "maximum: " (maximum t)))
-;    (println (str "search for 5: " (search t 5)))
-;    ))
-;
-;
-;(visual-tree-test test-tree-node "TreeNode")
+
+(defn visual-tree-test [t s]
+  (do
+    (message (str "Testing " s))
+    (println "tree: " t)
+    (println "tree (toString): " (str t))
+    (println (str "minimum: " (minimum t)))
+    (println (str "maximum: " (maximum t)))
+    (println (str "search for 5: " (search t 5)))
+    ))
+
+
+(visual-tree-test test-tree-node "TreeNode")
 
 (deftest test_basic_tree
   (is (= 4 (:key (minimum test-tree-node))))
@@ -47,19 +49,19 @@
 ;; ----------------------------------------------
 
 (def test-hash-tree
-  (loop [tht (dbg (HashTree. {}))
+  (loop [tht (dbg (create-HashTree))
          data (dbg test-data)]
     (if (= 0 (count data))
       (dbg tht)
       (recur
-        (dbg (insert tht (Node. (first data)(first data))))
+        (dbg (insert tht (create-Node (first data)(first data))))
         (dbg (rest data))))))
 
-;(visual-tree-test test-hash-tree "HashTree")
+(visual-tree-test test-hash-tree "HashTree")
 
 (deftest test_basic_hashtree
-  (is (= 4 (:key (minimum hashtree))))
-  (is (= 50 (:key (maximum hashtree)))))
+  (is (= 4 (:key (minimum test-hash-tree))))
+  (is (= 50 (:key (maximum test-hash-tree)))))
 
 ;; ----------------------------------------------
 ;; Run all tests
