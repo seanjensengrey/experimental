@@ -6,13 +6,19 @@ Hacking Through The Erlang Wilderness : Episode 2
 
 :Author: Todd D. Greenwood-Geer
 :Date: Tue Feb 12  2011
-:Version: 0.1
+:Version: 0.2
+:Index: Index_ : Listing of all the episodes
 
 -----------------------
 How to Create an App
 -----------------------
 
-In this demo, I'm going to use Sinan to create an application skeleton. Later, I'll use Rebar to create individual files. 
+In this demo, I'm going to use Sinan to create an application skeleton. Later, I'll use Rebar to create individual files. See:
+
+ * Sinan_Faxien_Demo_
+ * Basho_Rebar_Demo_
+ * Erlware_
+ * Rebar_
 
 1. Create A Sample Application Skeleton::
 
@@ -264,6 +270,10 @@ In this demo, I'm going to use Sinan to create an application skeleton. Later, I
 
 13. Ok, so we're definitely crapping out in the init. Call me crazy, but I think we're missing something here. My guess is that we need some piece of code that actually does something. You see, the _app is really just the wrapper to start and stop the app. The _sup is the management code. So what we probably need is something that the init calls into. Let's add a new file to src, called src/app01.erl. We can use Rebar_ to create this file:
 
+ * Install Rebar_ locally::
+    
+    todd@ubuntu:~/temp/app01$ wget http://bitbucket.org/basho/rebar/downloads/rebar; chmod u+x rebar
+
  * Create a gen_server file::
 
     todd@ubuntu:~/temp/app01$ rebar list-templates
@@ -457,3 +467,5 @@ References
 .. _Erlware: http://erlware.com/
 
 .. _Rebar: https://bitbucket.org/basho/rebar/wiki/GettingStarted
+
+.. _Index: https://github.com/ToddG/experimental/tree/master/erlang/wilderness

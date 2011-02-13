@@ -5,8 +5,9 @@ Hacking Through The Erlang Wilderness : Episode 1
 .. footer:: Copyright (c) 2011 Todd D. Greenwood-Geer 
 
 :Author: Todd D. Greenwood-Geer
-:Date: Tue Feb 12  2011
-:Version: 0.1
+:Date: Tue Feb 13  2011
+:Version: 0.2
+:Index: Index_ : Listing of all the episodes
 
 -----------------------
 Installation
@@ -145,3 +146,5 @@ References
 .. _Erlware: http://erlware.com/
 
 .. _Rebar: https://bitbucket.org/basho/rebar/wiki/GettingStarted
+
+.. _Index: https://github.com/ToddG/experimental/tree/master/erlang/wilderness
