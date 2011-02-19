@@ -474,6 +474,172 @@ What's interesting here is what does not get called. Apparently stopping an app 
 Add EUnit Tests
 ---------------
 
+
+1. Let's add some simple tests, but first we need to add an import statement to src/time_srv.erl.
+
+::
+
+    1 -module(time_srv).
+    2 -behaviour(gen_server).
+    3 -define(SERVER, ?MODULE).
+    4 
+    5 -define(TEST, test).
+    6 -ifdef(TEST).
+    7 -include_lib("eunit/include/eunit.hrl").
+    8 -endif. 
+
+I explicitly define TEST and then ifdef based on it here and below in the test definitions. Note that we don't have any internal functions defined yet, and we've already got some tests. This test simply checks that our app can be started.
+
+::
+
+     59 %% ------------------------------------------------------------------
+     60 %% Internal Function Definitions
+     61 %% ------------------------------------------------------------------
+     62 
+     63 %% ------------------------------------------------------------------
+     64 %% EUnit Tests
+     65 %% ------------------------------------------------------------------
+     66 -ifdef(TEST).
+     67 
+     68 simple_test() ->
+     69     ok = application:start(time_srv),
+     70     ?assertNot(undefined == whereis(time_srv_sup)).
+     71 -endif.
+
+2. Let's build and run the test
+
+::
+
+    todd@ubuntu:~/temp/time_srv$ sinan test
+    starting: depends
+    starting: build
+    starting: test
+    Testing time_srv
+    time_srv:  Test passed.
+    time_srv_app:  There were no tests to run.
+    time_srv_sup:  There were no tests to run.
+
+3. What happens when a test fails? Let's inject a failing test to see...
+
+::
+
+    72 failing_test() ->
+    73     ok = false.
+
+This results in a test failure...
+
+::
+
+    todd@ubuntu:~/temp/time_srv$ sinan test
+    starting: depends
+    starting: build
+    Building /home/todd/temp/time_srv/src/time_srv.erl
+    /home/todd/temp/time_srv/src/time_srv.erl:73:warning:this clause cannot match because of different types/sizes
+    /home/todd/temp/time_srv/src/time_srv.erl:73:warning:no clause will ever match
+
+    starting: test
+    Testing time_srv
+    time_srv:time_srv: failing_test...*failed*
+    ::error:{badmatch,false}
+      in function time_srv:failing_test/0
+
+
+    =======================================================
+      Failed: 1.  Skipped: 0.  Passed: 1.
+    time_srv_app:  There were no tests to run.
+    time_srv_sup:  There were no tests to run.
+
+4. Remove the failing test, or comment it out. We know what that does now.
+
+5. At long last, it's time for some Test Driven Development. Let's implement a function that actually does something...returns the current time. And the first thing we'll do is write a test for it. 
+
+So, add the following test:
+
+::
+    77 get_current_time() ->
+    78   {current_time, _ActualTime} = time_srv:get_time().
+
+Now run the test...
+
+::
+
+    todd@ubuntu:~/temp/time_srv$ sinan test
+    starting: depends
+    starting: build
+    Building /home/todd/temp/time_srv/src/time_srv.erl
+    /home/todd/temp/time_srv/src/time_srv.erl:77:warning:function get_current_time/0 is unused
+
+    starting: test
+    Testing time_srv
+    time_srv:  Test passed.
+    time_srv_app:  There were no tests to run.
+    time_srv_sup:  There were no tests to run.
+
+
+6. Notice my goof? I forgot to suffix the test method with 'test'. So it looked like my test was an un-exported module method::
+
+    /home/todd/temp/time_srv/src/time_srv.erl:77:warning:function get_current_time/0 is unused
+
+7. Let's fix the name of this test::
+
+    77 get_current_time_test() ->
+    78   {current_time, _ActualTime} = time_srv:get_time().
+
+8. Now run it
+
+::
+
+    todd@ubuntu:~/temp/time_srv$ sinan test
+    starting: depends
+    starting: build
+    Building /home/todd/temp/time_srv/src/time_srv.erl
+    starting: test
+    Testing time_srv
+    time_srv:time_srv: get_current_time_test...*failed*
+    ::error:undef
+      in function time_srv:get_time/0
+        called as get_time()
+      in call from time_srv:get_current_time_test/0
+
+
+    =======================================================
+      Failed: 1.  Skipped: 0.  Passed: 1.
+    time_srv_app:  There were no tests to run.
+    time_srv_sup:  There were no tests to run.
+
+9. Excellent, our test caught the undeclared method. Let's declare it::
+
+    17 -export([get_time/0]).
+
+10. Now re-run::
+
+    todd@ubuntu:~/temp/time_srv$ sinan test
+    starting: depends
+    starting: build
+    Building /home/todd/temp/time_srv/src/time_srv.erl
+    /home/todd/temp/time_srv/src/time_srv.erl:17:error:function get_time/0 undefined
+
+    build problem build_errors
+
+11. Ah, we need to implement the method::
+
+    33 get_time() ->
+    34   {current_time, unknown}.
+
+So, this implementation doesn't actually return a time, but at least the method is defined, and the message format is clear. This test should pass, based on the current test::
+
+    todd@ubuntu:~/temp/time_srv$ sinan test
+    starting: depends
+    starting: build
+    Building /home/todd/temp/time_srv/src/time_srv.erl
+    starting: test
+    Testing time_srv
+    time_srv:  All 2 tests passed.
+    time_srv_app:  There were no tests to run.
+    time_srv_sup:  There were no tests to run.
+
+A copy of the code at this point is here under time-srv-03.
+
 Add Time Server Functionality
 -----------------------------
 
