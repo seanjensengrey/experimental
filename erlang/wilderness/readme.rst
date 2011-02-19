@@ -26,6 +26,6 @@ Episodes
  * Episode-02_ : Create a basic app
  * Episode-03_ : Create a Time Server App (WIP)
 
-.. _Episode-01: https://github.com/ToddG/experimental/blob/master/erlang/wilderness/01/episode-01.rst
-.. _Episode-02: https://github.com/ToddG/experimental/blob/master/erlang/wilderness/02/episode-02.rst
-.. _Episode-03: https://github.com/ToddG/experimental/blob/master/erlang/wilderness/03/episode-03.rst
+.. _Episode-01: https://github.com/ToddG/experimental/blob/master/erlang/wilderness/01/
+.. _Episode-02: https://github.com/ToddG/experimental/blob/master/erlang/wilderness/02/
+.. _Episode-03: https://github.com/ToddG/experimental/blob/master/erlang/wilderness/03/

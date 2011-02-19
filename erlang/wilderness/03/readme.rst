@@ -692,4 +692,4 @@ References
 
 .. _Index: https://github.com/ToddG/experimental/tree/master/erlang/wilderness
 
-.. _Episode-02: https://github.com/ToddG/experimental/tree/master/erlang/wilderness/02/episode-02.html
+.. _Episode-02: https://github.com/ToddG/experimental/tree/master/erlang/wilderness/02
