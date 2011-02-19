@@ -24,7 +24,7 @@ Episodes
 -----------------------
  * Episode-01_ : Install Erlang and Tools
  * Episode-02_ : Create a basic app
- * Episode-03_ : Create a Time Server App (WIP)
+ * Episode-03_ : Create a Time Server App
 
 .. _Episode-01: https://github.com/ToddG/experimental/blob/master/erlang/wilderness/01/
 .. _Episode-02: https://github.com/ToddG/experimental/blob/master/erlang/wilderness/02/
