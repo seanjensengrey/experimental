@@ -274,11 +274,208 @@ I inserted the reference to the time_srv behaviour in line 6 above.
 
 6. Ok, at this point, we're where we left off in Episode-02_. A copy of the code at this point is here under time-srv-01.
 
-Time Server Functionality
--------------------------
+Add Logging
+-----------
 
-TODO
- 
+Let's instrument our app so that we can get a better idea of what's going on.
+
+1. Add logging to src/time_srv.erl. 
+
+*Note that I'm modifying the parameters by removing any "_" (underscore) prefixes to the variables. This means that instead of not being bound, these variables are bound and we can then print them out in our logging messages.*
+
+::
+     21 start_link() ->
+     22   error_logger:info_msg("[~p] start_link()~n", [?MODULE]),
+     23   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+     24 
+     25 %% ------------------------------------------------------------------
+     26 %% gen_server Function Definitions
+     27 %% ------------------------------------------------------------------
+     28 
+     29 init(Args) ->
+     30   error_logger:info_msg("[~p] init(~p)~n", [?MODULE, Args]),
+     31   {ok, Args}.
+     32 
+     33 handle_call(Request, From, State) ->
+     34   error_logger:info_msg("[~p] handle_call(~p,~p,~p)~n", [?MODULE, Request, From, State]),
+     35   {noreply, ok, State}.
+     36 
+     37 handle_cast(Msg, State) ->
+     38   error_logger:info_msg("[~p] handle_cast(~p,~p)~n", [?MODULE, Msg, State]),
+     39   {noreply, State}.
+     40 
+     41 handle_info(Info, State) ->
+     42   error_logger:info_msg("[~p] handle_info(~p,~p)~n", [?MODULE, Info, State]),
+     43   {noreply, State}.
+     44 
+     45 terminate(Reason, State) ->
+     46   error_logger:info_msg("[~p] terminate(~p,~p)~n", [?MODULE, Reason, State]),
+     47   ok.
+     48 
+     49 code_change(OldVsn, State, Extra) ->
+     50   error_logger:info_msg("[~p] code_change(~p,~p,~p)~n", [?MODULE, OldVsn, State,Extra]),
+     51   {ok, State}.
+     52 
+
+2. Build the app and launch the erlang shell (but don't start the app yet)
+
+::
+    $ sinan build
+    $ sinan shell
+
+    Erlang R14B01 (erts-5.8.2) [source] [rq:1] [async-threads:0] [hipe] [kernel-poll:false]
+
+    Eshell V5.8.2  (abort with ^G)
+    1> starting: depends
+    starting: build
+    starting: shell
+    Eshell V5.8.2  (abort with ^G)
+
+
+2. We're using the error_logger (see ErlDocs_Logger_)  instead of the io:format. This means we have to turn on logging in our node or we won't see anything.
+
+::
+    1> error_logger:tty(true).
+    ok
+
+3. Now start the application
+
+::
+    2> application:start(time_srv).
+
+4. And bask in the glory of your new debug messages
+
+::
+
+    =INFO REPORT==== 18-Feb-2011::19:58:39 ===
+    [time_srv] start_link()
+       
+    =INFO REPORT==== 18-Feb-2011::19:58:39 ===
+    [time_srv] init([])
+    3> ok 
+
+5. Terminate the app, and look at the logging there
+
+::
+    4> application:stop(time_srv). 
+
+    =INFO REPORT==== 18-Feb-2011::20:07:14 ===
+        application: time_srv
+        exited: stopped
+        type: temporary
+    1> ok
+
+6. But this doesn't give us the full picture, let's instrument the app and the supervisor files, too.
+
+First, instrument src/time_srv_app.erl
+
+::
+
+     23 start(StartType, StartArgs) ->                             
+     24   error_logger:info_msg("[~p] start(~p,~p)~n", [?MODULE, StartType, StartArgs]),        
+     25   case time_srv_sup:start_link() of                                                
+     26       {ok, Pid} ->                                                                 
+     27           {ok, Pid};                                                               
+     28       Error ->        
+     29           Error   
+     30   end.                                                      
+     31              
+     32 %% @private                    
+     33 -spec stop(State::any()) -> ok.      
+     34 stop(State) ->                                                                               
+     35   error_logger:info_msg("[~p] stop(~p)~n", [?MODULE, State]),                   
+     36   ok.  
+
+Second, instrument the supervisor in src/time_srv_sup.erl
+
+::
+
+     24 start_link() ->
+     25   error_logger:info_msg("[~p] start_link()~n", [?MODULE]),
+     26   supervisor:start_link({local, ?SERVER}, ?MODULE, []).
+     27 
+     28 %%%===================================================================
+     29 %%% Supervisor callbacks
+     30 %%%===================================================================
+     31 
+     32 
+     33 %% @private
+     34 -spec init(list()) -> {ok, {SupFlags::any(), [ChildSpec::any()]}} |
+     35                        ignore | {error, Reason::any()}.
+     36 init([]) ->
+     37   error_logger:info_msg("[~p] init([])~n", [?MODULE]),
+
+7. Rebuild and relaunch the shell
+
+::
+
+    todd@ubuntu:~/temp/time_srv$ sinan build
+    starting: depends
+    starting: build
+    Building /home/todd/temp/time_srv/src/time_srv_sup.erl
+    Building /home/todd/temp/time_srv/src/time_srv_app.erl
+    todd@ubuntu:~/temp/time_srv$ sinan shell
+    Erlang R14B01 (erts-5.8.2) [source] [rq:1] [async-threads:0] [hipe] [kernel-poll:false]
+
+    Eshell V5.8.2  (abort with ^G)
+    1> starting: depends
+    starting: build
+    starting: shell
+    Eshell V5.8.2  (abort with ^G)
+    1> 
+
+8. Turn on logging
+
+::
+
+    1> error_logger:tty(true).
+    ok
+
+9. Start the time_srv application
+
+::
+
+    2> application:start(time_srv).
+
+    =INFO REPORT==== 18-Feb-2011::20:16:53 ===
+    [time_srv_app] start(normal,[])
+       
+    =INFO REPORT==== 18-Feb-2011::20:16:53 ===
+    [time_srv_sup] start_link()
+       
+    =INFO REPORT==== 18-Feb-2011::20:16:53 ===
+    [time_srv_sup] init([])
+       
+    =INFO REPORT==== 18-Feb-2011::20:16:53 ===
+    [time_srv] start_link()
+       
+    =INFO REPORT==== 18-Feb-2011::20:16:53 ===
+    [time_srv] init([])
+    1> ok    
+
+So, you can trace the starting of an application:
+
+    *app -> sup -> module*
+
+10. Now stop the application
+
+::
+    =INFO REPORT==== 18-Feb-2011::20:18:45 ===
+    [time_srv_app] stop([])
+       
+    =INFO REPORT==== 18-Feb-2011::20:18:45 ===
+        application: time_srv
+        exited: stopped
+        type: temporary
+    1> ok
+
+What's interesting here is what does not get called. Apparently stopping an app invokes the time_srv_app.stop() method, but not the time_srv.terminate() method. Good to know. We'll use this logging as we start to implement more interesting functionality in our time server. The code, at this point is available under time-srv-02.
+    
+Add EUnit Tests
+---------------
+
+Add Time Server Functionality
+-----------------------------
 
 References
 ==========
@@ -297,6 +494,8 @@ References
     Logan, Martin, Merritt, Eric, Carlsson, Richard.
     Erlang and OTP in Action
     Manning, 2011. ISBN 9781933988788
+
+.. _ErlDocs_Logger: http://erldocs.com/R14B01/kernel/error_logger.html?i=91
 
 .. _SinanProjects: http://erlware.github.com/sinan/SinanProjects.html
 
