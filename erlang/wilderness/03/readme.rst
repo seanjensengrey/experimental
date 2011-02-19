@@ -284,6 +284,7 @@ Let's instrument our app so that we can get a better idea of what's going on.
 *Note that I'm modifying the parameters by removing any "_" (underscore) prefixes to the variables. This means that instead of not being bound, these variables are bound and we can then print them out in our logging messages.*
 
 ::
+
      21 start_link() ->
      22   error_logger:info_msg("[~p] start_link()~n", [?MODULE]),
      23   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
@@ -320,6 +321,7 @@ Let's instrument our app so that we can get a better idea of what's going on.
 2. Build the app and launch the erlang shell (but don't start the app yet)
 
 ::
+
     $ sinan build
     $ sinan shell
 
@@ -335,12 +337,14 @@ Let's instrument our app so that we can get a better idea of what's going on.
 2. We're using the error_logger (see ErlDocs_Logger_)  instead of the io:format. This means we have to turn on logging in our node or we won't see anything.
 
 ::
+
     1> error_logger:tty(true).
     ok
 
 3. Now start the application
 
 ::
+
     2> application:start(time_srv).
 
 4. And bask in the glory of your new debug messages
@@ -349,7 +353,7 @@ Let's instrument our app so that we can get a better idea of what's going on.
 
     =INFO REPORT==== 18-Feb-2011::19:58:39 ===
     [time_srv] start_link()
-       
+    //  
     =INFO REPORT==== 18-Feb-2011::19:58:39 ===
     [time_srv] init([])
     3> ok 
@@ -357,7 +361,10 @@ Let's instrument our app so that we can get a better idea of what's going on.
 5. Terminate the app, and look at the logging there
 
 ::
+
     4> application:stop(time_srv). 
+
+::
 
     =INFO REPORT==== 18-Feb-2011::20:07:14 ===
         application: time_srv
@@ -460,6 +467,7 @@ So, you can trace the starting of an application:
 10. Now stop the application
 
 ::
+
     =INFO REPORT==== 18-Feb-2011::20:18:45 ===
     [time_srv_app] stop([])
        
@@ -556,6 +564,7 @@ This results in a test failure...
 So, add the following test:
 
 ::
+
     77 get_current_time() ->
     78   {current_time, _ActualTime} = time_srv:get_time().
 
@@ -611,22 +620,28 @@ Now run the test...
 
     17 -export([get_time/0]).
 
-10. Now re-run::
+10. Now re-run
+
+::
 
     todd@ubuntu:~/temp/time_srv$ sinan test
     starting: depends
     starting: build
     Building /home/todd/temp/time_srv/src/time_srv.erl
     /home/todd/temp/time_srv/src/time_srv.erl:17:error:function get_time/0 undefined
-
+    
     build problem build_errors
 
-11. Ah, we need to implement the method::
+11. Ah, we need to implement the method
+
+::
 
     33 get_time() ->
     34   {current_time, unknown}.
 
-So, this implementation doesn't actually return a time, but at least the method is defined, and the message format is clear. This test should pass, based on the current test::
+So, this implementation doesn't actually return a time, but at least the method is defined, and the message format is clear. This test should pass, based on the current test
+
+::
 
     todd@ubuntu:~/temp/time_srv$ sinan test
     starting: depends
@@ -642,6 +657,8 @@ A copy of the code at this point is here under time-srv-03.
 
 Add Time Server Functionality
 -----------------------------
+
+TODO: the differences between invoking the module methods vs calling the gen_server methods.
 
 References
 ==========
