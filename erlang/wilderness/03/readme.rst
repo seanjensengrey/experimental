@@ -639,7 +639,7 @@ Now run the test...
     33 get_time() ->
     34   {current_time, unknown}.
 
-So, this implementation doesn't actually return a time, but at least the method is defined, and the message format is clear. This test should pass, based on the current test
+So, this implementation doesn't actually return a time, but at least the method is defined, and the message format is clear. This test should pass.
 
 ::
 
@@ -658,7 +658,158 @@ A copy of the code at this point is here under time-srv-03.
 Add Time Server Functionality
 -----------------------------
 
-TODO: the differences between invoking the module methods vs calling the gen_server methods.
+1. Update the API method in src/time_srv.erl
+
+::
+
+    33 get_time() ->
+    34   error_logger:info_msg("[~p] get_time()~n", [?MODULE]),
+    35   gen_server:call(?SERVER, get_time).
+   
+Note: The 'get_tme() api method delegates to gen_server:
+
+ * ?SERVER : we'll use the name of this module, 'time_srv', as the name of the process to forward this call to. Essentially, this means we are expecting 'time_srv' to be a singleton process within this erlang node.
+ * 'get_time' : this atom defines the method we are invoking
+
+2. Update the handle_call method in src/time_srv.erl
+
+::
+
+    44 handle_call(Request, From, State) ->
+    45   error_logger:info_msg("[~p] handle_call(~p,~p,~p)~n", [?MODULE, Request, From, State]),
+    46   case Request of
+    47     get_time ->
+    48       Now = calendar:local_time(),
+    49       NowSecs = calendar:datetime_to_gregorian_seconds(Now),
+    50       {reply, {current_time, NowSecs}, State};
+    51     _ ->
+    52       {reply, {unrecognized, Request}, State}
+    53   end.
+
+ * handle_call switches on the Request
+ * when handle_call receives a 'get_time' in the Request, it builds a response with the current_time in seconds
+ * See the Calendar_ docs for more details on the calendar module
+
+3. Update the test to verify the results
+
+::
+
+    84 get_current_time_test() ->
+    85   Before = calendar:local_time(),
+    86   BeforeSecs = calendar:datetime_to_gregorian_seconds(Before),
+    87   {current_time, ActualSecs} = time_srv:get_time(),
+    88   After = calendar:local_time(),
+    89   AfterSecs = calendar:datetime_to_gregorian_seconds(After),
+    90   %assertions
+    91   ?assert(BeforeSecs =< ActualSecs),
+    92   ?assert(AfterSecs >= ActualSecs).
+
+ * the key thing here is that we can call the api method on the server, 'time_srv', and the api will use gen_server to create a message and send it to the time_srv process
+ * notice the use of asserts, see the Eunit_ Docs for more details
+
+
+Invoking Methods
+----------------
+Let's play around with our new service. It might be interesting to examine the differences between invoking the module methods vs calling the gen_server methods.
+
+1. Start the shell
+
+::
+
+    todd@ubuntu:~/temp/time_srv$ sinan build
+    starting: depends
+    starting: build
+    todd@ubuntu:~/temp/time_srv$ sinan shell
+    Erlang R14B01 (erts-5.8.2) [source] [rq:1] [async-threads:0] [hipe] [kernel-poll:false]
+
+    Eshell V5.8.2  (abort with ^G)
+    1> starting: depends
+    starting: build
+    starting: shell
+    Eshell V5.8.2  (abort with ^G)
+    1> 
+
+2. Start the service
+
+::
+
+    1> application:start(time_srv).
+    ok
+
+3. Woops. Logging isn't turned on...let's try that again. Exit from the shell and start over
+
+::
+
+    todd@ubuntu:~/temp/time_srv$ sinan shell
+    Erlang R14B01 (erts-5.8.2) [source] [rq:1] [async-threads:0] [hipe] [kernel-poll:false]
+
+    Eshell V5.8.2  (abort with ^G)
+    1> starting: depends
+    starting: build
+    starting: shell
+    Eshell V5.8.2  (abort with ^G)
+    1> error_logger:tty(true).
+    ok
+    2> application:start(time_srv).
+
+    =INFO REPORT==== 19-Feb-2011::09:20:18 ===
+    [time_srv_app] start(normal,[])
+       
+    =INFO REPORT==== 19-Feb-2011::09:20:18 ===
+    [time_srv_sup] start_link()
+       
+    =INFO REPORT==== 19-Feb-2011::09:20:18 ===
+    [time_srv_sup] init([])
+       
+    =INFO REPORT==== 19-Feb-2011::09:20:18 ===
+    [time_srv] start_link()
+       
+    =INFO REPORT==== 19-Feb-2011::09:20:18 ===
+    [time_srv] init([])
+    1> ok
+    3> 
+
+4. Invoke the method from the API...
+
+::
+
+    3> time_srv:get_time().
+
+    =INFO REPORT==== 19-Feb-2011::09:21:38 ===
+    [time_srv] get_time()
+       
+    =INFO REPORT==== 19-Feb-2011::09:21:38 ===
+    [time_srv] handle_call(get_time,{<0.80.0>,#Ref<0.0.0.397>},[])
+    1> {current_time,63465326498}
+
+5. Now let's stop the process an try to invoke this method on a stopped process
+
+::
+
+    5> application:stop(time_srv).
+
+    =INFO REPORT==== 19-Feb-2011::09:23:02 ===
+    [time_srv_app] stop([])
+       
+    =INFO REPORT==== 19-Feb-2011::09:23:02 ===
+        application: time_srv
+        exited: stopped
+        type: temporary
+    1> ok
+    6> time_srv:get_time().        
+
+    =INFO REPORT==== 19-Feb-2011::09:23:10 ===
+    [time_srv] get_time()
+    1> ** exception exit: {noproc,{gen_server,call,[time_srv,get_time]}}
+         in function  gen_server:call/2
+
+A copy of the code at this point is here under time-srv-04.
+
+Wrap Up
+-------
+
+That's it.
+
 
 References
 ==========
@@ -693,3 +844,7 @@ References
 .. _Index: https://github.com/ToddG/experimental/tree/master/erlang/wilderness
 
 .. _Episode-02: https://github.com/ToddG/experimental/tree/master/erlang/wilderness/02
+
+.. _Calendar: http://erldocs.com/R14B01/stdlib/calendar.html?i=230
+
+.. _Eunit: http://svn.process-one.net/contribs/trunk/eunit/doc/overview-summary.html
